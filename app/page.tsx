@@ -1,9 +1,9 @@
-import FacebookPost from "../facebook-post"
+import FacebookPublisher from "../facebook-publisher"
 
 export default function Page() {
   return (
-    <div>
-      <FacebookPost />
+    <div className="min-h-screen bg-gray-50">
+      <FacebookPublisher />
     </div>
   )
 }

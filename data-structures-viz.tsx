@@ -1,6 +1,38 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import {
+  Play,
+  Pause,
+  RotateCcw,
+  ChevronLeft,
+  ChevronRight,
+  Settings,
+  Bookmark,
+  BookmarkPlus,
+  Trash2,
+  FolderOpen,
+} from "lucide-react"
+
+interface OperationStep {
+  type: "array" | "linkedList" | "tree" | "graph"
+  operation: "insert" | "delete"
+  value?: number
+  index?: number
+  description: string
+}
+
+interface BookmarkData {
+  id: string
+  name: string
+  timestamp: number
+  step: number
+  arrayData: number[]
+  linkedListData: number[]
+  treeNodes: number[]
+  graphEdges: { from: string; to: string }[]
+  description: string
+}
 
 export function DataStructuresVisualization() {
   // Array animation state
@@ -28,12 +60,214 @@ export function DataStructuresVisualization() {
   ])
   const [graphHighlight, setGraphHighlight] = useState("")
 
-  // Animation cycle
+  // Animation control state
+  const [isPlaying, setIsPlaying] = useState(true)
+  const [animationSpeed, setAnimationSpeed] = useState(3000)
+  const [isManualMode, setIsManualMode] = useState(false)
+
+  // Manual mode state
+  const [currentStep, setCurrentStep] = useState(0)
+  const [operationHistory, setOperationHistory] = useState<any[]>([])
+  const [nextOperation, setNextOperation] = useState<OperationStep | null>(null)
+  const [isExecutingStep, setIsExecutingStep] = useState(false)
+
+  // Bookmark state
+  const [bookmarks, setBookmarks] = useState<BookmarkData[]>([])
+  const [showBookmarks, setShowBookmarks] = useState(false)
+  const [bookmarkName, setBookmarkName] = useState("")
+  const [showBookmarkInput, setShowBookmarkInput] = useState(false)
+
+  // Load bookmarks from localStorage on mount
   useEffect(() => {
+    const savedBookmarks = localStorage.getItem("ds-visualization-bookmarks")
+    if (savedBookmarks) {
+      try {
+        setBookmarks(JSON.parse(savedBookmarks))
+      } catch (error) {
+        console.error("Failed to load bookmarks:", error)
+      }
+    }
+  }, [])
+
+  // Save bookmarks to localStorage whenever bookmarks change
+  useEffect(() => {
+    localStorage.setItem("ds-visualization-bookmarks", JSON.stringify(bookmarks))
+  }, [bookmarks])
+
+  // Generate next operation
+  const generateNextOperation = (): OperationStep => {
+    const operations = ["array", "linkedList", "tree", "graph"]
+    const currentOp = operations[currentStep % operations.length]
+
+    switch (currentOp) {
+      case "array":
+        const arrayIsInsert = Math.random() > 0.5
+        if (arrayIsInsert && arrayData.length < 7) {
+          const newValue = Math.floor(Math.random() * 100)
+          const insertIndex = Math.floor(Math.random() * (arrayData.length + 1))
+          return {
+            type: "array",
+            operation: "insert",
+            value: newValue,
+            index: insertIndex,
+            description: `Insert ${newValue} at index ${insertIndex} in array`,
+          }
+        } else if (!arrayIsInsert && arrayData.length > 3) {
+          const deleteIndex = Math.floor(Math.random() * arrayData.length)
+          return {
+            type: "array",
+            operation: "delete",
+            index: deleteIndex,
+            description: `Delete element at index ${deleteIndex} from array`,
+          }
+        }
+        break
+
+      case "linkedList":
+        const listIsInsert = Math.random() > 0.5
+        if (listIsInsert && linkedListData.length < 5) {
+          const newValue = Math.floor(Math.random() * 100)
+          const insertIndex = Math.floor(Math.random() * (linkedListData.length + 1))
+          return {
+            type: "linkedList",
+            operation: "insert",
+            value: newValue,
+            index: insertIndex,
+            description: `Insert ${newValue} at position ${insertIndex} in linked list`,
+          }
+        } else if (!listIsInsert && linkedListData.length > 2) {
+          const deleteIndex = Math.floor(Math.random() * linkedListData.length)
+          return {
+            type: "linkedList",
+            operation: "delete",
+            index: deleteIndex,
+            description: `Delete node at position ${deleteIndex} from linked list`,
+          }
+        }
+        break
+
+      case "tree":
+        if (treeNodes.length < 10) {
+          const newValue = Math.floor(Math.random() * 100)
+          return {
+            type: "tree",
+            operation: "insert",
+            value: newValue,
+            description: `Insert ${newValue} into binary search tree`,
+          }
+        }
+        break
+
+      case "graph":
+        const nodes = ["A", "B", "C", "D"]
+        const allPossibleEdges = []
+        for (let i = 0; i < nodes.length; i++) {
+          for (let j = i + 1; j < nodes.length; j++) {
+            allPossibleEdges.push({ from: nodes[i], to: nodes[j] })
+          }
+        }
+
+        const graphIsAdd = Math.random() > 0.5
+        if (graphIsAdd) {
+          const availableEdges = allPossibleEdges.filter(
+            (edge) =>
+              !graphEdges.some(
+                (existing) =>
+                  (existing.from === edge.from && existing.to === edge.to) ||
+                  (existing.from === edge.to && existing.to === edge.from),
+              ),
+          )
+          if (availableEdges.length > 0) {
+            const newEdge = availableEdges[Math.floor(Math.random() * availableEdges.length)]
+            return {
+              type: "graph",
+              operation: "insert",
+              description: `Add edge between ${newEdge.from} and ${newEdge.to}`,
+            }
+          }
+        } else if (graphEdges.length > 3) {
+          const edgeToRemove = graphEdges[Math.floor(Math.random() * graphEdges.length)]
+          return {
+            type: "graph",
+            operation: "delete",
+            description: `Remove edge between ${edgeToRemove.from} and ${edgeToRemove.to}`,
+          }
+        }
+        break
+    }
+
+    // Fallback operation
+    return {
+      type: "array",
+      operation: "insert",
+      value: Math.floor(Math.random() * 100),
+      index: arrayData.length,
+      description: "Insert element at end of array",
+    }
+  }
+
+  // Update next operation when step changes
+  useEffect(() => {
+    if (isManualMode) {
+      setNextOperation(generateNextOperation())
+    }
+  }, [currentStep, isManualMode, arrayData, linkedListData, treeNodes, graphEdges])
+
+  // Bookmark functions
+  const saveBookmark = () => {
+    if (!bookmarkName.trim()) return
+
+    const bookmark: BookmarkData = {
+      id: Date.now().toString(),
+      name: bookmarkName.trim(),
+      timestamp: Date.now(),
+      step: currentStep,
+      arrayData: [...arrayData],
+      linkedListData: [...linkedListData],
+      treeNodes: [...treeNodes],
+      graphEdges: [...graphEdges],
+      description: nextOperation?.description || "Current state",
+    }
+
+    setBookmarks((prev) => [...prev, bookmark])
+    setBookmarkName("")
+    setShowBookmarkInput(false)
+  }
+
+  const loadBookmark = (bookmark: BookmarkData) => {
+    setArrayData(bookmark.arrayData)
+    setLinkedListData(bookmark.linkedListData)
+    setTreeNodes(bookmark.treeNodes)
+    setGraphEdges(bookmark.graphEdges)
+    setCurrentStep(bookmark.step)
+    setOperationHistory([])
+    setShowBookmarks(false)
+
+    // Clear any ongoing operations
+    setArrayHighlight(-1)
+    setArrayOperation("idle")
+    setLinkedListHighlight(-1)
+    setLinkedListOperation("idle")
+    setTreeHighlight(-1)
+    setTreeOperation("idle")
+    setGraphHighlight("")
+  }
+
+  const deleteBookmark = (bookmarkId: string) => {
+    setBookmarks((prev) => prev.filter((b) => b.id !== bookmarkId))
+  }
+
+  const formatTimestamp = (timestamp: number) => {
+    return new Date(timestamp).toLocaleString()
+  }
+
+  // Auto animation cycle
+  useEffect(() => {
+    if (!isPlaying || isManualMode) return
+
     const interval = setInterval(() => {
-      // Cycle through different operations
       const operations = ["array", "linkedList", "tree", "graph"]
-      const currentOp = operations[Math.floor(Date.now() / 3000) % operations.length]
+      const currentOp = operations[Math.floor(Date.now() / animationSpeed) % operations.length]
 
       switch (currentOp) {
         case "array":
@@ -52,7 +286,126 @@ export function DataStructuresVisualization() {
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [])
+  }, [isPlaying, animationSpeed, isManualMode])
+
+  const executeStep = async (operation: OperationStep) => {
+    if (isExecutingStep) return
+
+    setIsExecutingStep(true)
+
+    // Save current state to history
+    const currentState = {
+      arrayData: [...arrayData],
+      linkedListData: [...linkedListData],
+      treeNodes: [...treeNodes],
+      graphEdges: [...graphEdges],
+      step: currentStep,
+    }
+    setOperationHistory((prev) => [...prev, currentState])
+
+    switch (operation.type) {
+      case "array":
+        if (operation.operation === "insert" && operation.value !== undefined && operation.index !== undefined) {
+          setArrayOperation("insert")
+          setArrayHighlight(operation.index)
+
+          setTimeout(() => {
+            setArrayData((prev) => {
+              const newArray = [...prev]
+              newArray.splice(operation.index!, 0, operation.value!)
+              return newArray
+            })
+            setTimeout(() => {
+              setArrayHighlight(-1)
+              setArrayOperation("idle")
+              setIsExecutingStep(false)
+            }, 500)
+          }, 500)
+        } else if (operation.operation === "delete" && operation.index !== undefined) {
+          setArrayOperation("delete")
+          setArrayHighlight(operation.index)
+
+          setTimeout(() => {
+            setArrayData((prev) => prev.filter((_, i) => i !== operation.index))
+            setTimeout(() => {
+              setArrayHighlight(-1)
+              setArrayOperation("idle")
+              setIsExecutingStep(false)
+            }, 500)
+          }, 500)
+        }
+        break
+
+      case "linkedList":
+        if (operation.operation === "insert" && operation.value !== undefined && operation.index !== undefined) {
+          setLinkedListOperation("insert")
+          setLinkedListHighlight(operation.index)
+
+          setTimeout(() => {
+            setLinkedListData((prev) => {
+              const newArray = [...prev]
+              newArray.splice(operation.index!, 0, operation.value!)
+              return newArray
+            })
+            setTimeout(() => {
+              setLinkedListHighlight(-1)
+              setLinkedListOperation("idle")
+              setIsExecutingStep(false)
+            }, 500)
+          }, 500)
+        } else if (operation.operation === "delete" && operation.index !== undefined) {
+          setLinkedListOperation("delete")
+          setLinkedListHighlight(operation.index)
+
+          setTimeout(() => {
+            setLinkedListData((prev) => prev.filter((_, i) => i !== operation.index))
+            setTimeout(() => {
+              setLinkedListHighlight(-1)
+              setLinkedListOperation("idle")
+              setIsExecutingStep(false)
+            }, 500)
+          }, 500)
+        }
+        break
+
+      case "tree":
+        if (operation.operation === "insert" && operation.value !== undefined) {
+          setTreeOperation("insert")
+          setTreeHighlight(0)
+
+          setTimeout(() => {
+            setTreeNodes((prev) => [...prev, operation.value!].sort((a, b) => a - b))
+            setTimeout(() => {
+              setTreeHighlight(-1)
+              setTreeOperation("idle")
+              setIsExecutingStep(false)
+            }, 500)
+          }, 500)
+        }
+        break
+
+      case "graph":
+        setTimeout(() => {
+          setIsExecutingStep(false)
+        }, 1000)
+        break
+    }
+
+    setCurrentStep((prev) => prev + 1)
+  }
+
+  const goToPreviousStep = () => {
+    if (operationHistory.length === 0) return
+
+    const previousState = operationHistory[operationHistory.length - 1]
+    setArrayData(previousState.arrayData)
+    setLinkedListData(previousState.linkedListData)
+    setTreeNodes(previousState.treeNodes)
+    setGraphEdges(previousState.graphEdges)
+    setCurrentStep(previousState.step)
+
+    setOperationHistory((prev) => prev.slice(0, -1))
+  }
 
   const animateArray = () => {
     if (arrayOperation === "idle") {
@@ -133,7 +486,6 @@ export function DataStructuresVisualization() {
         setTreeOperation("insert")
         const newValue = Math.floor(Math.random() * 100)
 
-        // Find insertion point in BST
         let currentIndex = 0
         while (currentIndex < treeNodes.length) {
           if (newValue < treeNodes[currentIndex]) {
@@ -201,8 +553,219 @@ export function DataStructuresVisualization() {
     }
   }
 
+  const resetAnimations = () => {
+    setArrayData([42, 17, 89, 23, 56])
+    setArrayHighlight(-1)
+    setArrayOperation("idle")
+    setLinkedListData([10, 20, 30])
+    setLinkedListHighlight(-1)
+    setLinkedListOperation("idle")
+    setTreeNodes([50, 30, 70, 20, 40, 60, 80])
+    setTreeHighlight(-1)
+    setTreeOperation("idle")
+    setGraphEdges([
+      { from: "A", to: "B" },
+      { from: "A", to: "C" },
+      { from: "B", to: "D" },
+      { from: "C", to: "D" },
+      { from: "A", to: "D" },
+    ])
+    setGraphHighlight("")
+    setCurrentStep(0)
+    setOperationHistory([])
+  }
+
   return (
     <div className="w-full h-80 p-6 bg-gradient-to-br from-blue-50 to-purple-50">
+      {/* Animation Controls */}
+      <div className="flex items-center justify-between mb-4 p-3 bg-white/50 rounded-lg border border-gray-200">
+        <div className="flex items-center space-x-3">
+          {/* Mode Toggle */}
+          <button
+            onClick={() => setIsManualMode(!isManualMode)}
+            className={`flex items-center justify-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+              isManualMode
+                ? "bg-purple-500 hover:bg-purple-600 text-white"
+                : "bg-gray-200 hover:bg-gray-300 text-gray-700"
+            }`}
+          >
+            <Settings className="w-4 h-4 mr-1" />
+            {isManualMode ? "Manual" : "Auto"}
+          </button>
+
+          {!isManualMode ? (
+            <>
+              <button
+                onClick={() => setIsPlaying(!isPlaying)}
+                className={`flex items-center justify-center w-10 h-10 rounded-full transition-all duration-200 ${
+                  isPlaying
+                    ? "bg-orange-500 hover:bg-orange-600 text-white"
+                    : "bg-green-500 hover:bg-green-600 text-white"
+                }`}
+              >
+                {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
+              </button>
+              <div className="text-sm font-medium text-gray-700">{isPlaying ? "Playing" : "Paused"}</div>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={goToPreviousStep}
+                disabled={operationHistory.length === 0}
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white transition-all duration-200"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+
+              <button
+                onClick={() => nextOperation && executeStep(nextOperation)}
+                disabled={isExecutingStep || !nextOperation}
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-green-500 hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white transition-all duration-200"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+
+              <div className="text-sm font-medium text-gray-700">
+                Step {currentStep} {isExecutingStep && "(Executing...)"}
+              </div>
+            </>
+          )}
+
+          <button
+            onClick={resetAnimations}
+            className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-500 hover:bg-gray-600 text-white transition-all duration-200"
+          >
+            <RotateCcw className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="flex items-center space-x-3">
+          {/* Bookmark Controls */}
+          {isManualMode && (
+            <>
+              <button
+                onClick={() => setShowBookmarkInput(!showBookmarkInput)}
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-yellow-500 hover:bg-yellow-600 text-white transition-all duration-200"
+                title="Save Bookmark"
+              >
+                <BookmarkPlus className="w-5 h-5" />
+              </button>
+
+              <button
+                onClick={() => setShowBookmarks(!showBookmarks)}
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white transition-all duration-200"
+                title="Load Bookmark"
+              >
+                <FolderOpen className="w-5 h-5" />
+              </button>
+            </>
+          )}
+
+          {!isManualMode && (
+            <>
+              <label className="text-sm font-medium text-gray-700">Speed:</label>
+              <select
+                value={animationSpeed}
+                onChange={(e) => setAnimationSpeed(Number(e.target.value))}
+                className="px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value={1500}>Fast (1.5s)</option>
+                <option value={3000}>Normal (3s)</option>
+                <option value={5000}>Slow (5s)</option>
+              </select>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Bookmark Input */}
+      {showBookmarkInput && (
+        <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="flex items-center space-x-3">
+            <input
+              type="text"
+              value={bookmarkName}
+              onChange={(e) => setBookmarkName(e.target.value)}
+              placeholder="Enter bookmark name..."
+              className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              onKeyPress={(e) => e.key === "Enter" && saveBookmark()}
+            />
+            <button
+              onClick={saveBookmark}
+              disabled={!bookmarkName.trim()}
+              className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 disabled:bg-gray-300 text-white text-sm font-medium rounded transition-all duration-200"
+            >
+              Save
+            </button>
+            <button
+              onClick={() => {
+                setShowBookmarkInput(false)
+                setBookmarkName("")
+              }}
+              className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded transition-all duration-200"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Bookmarks List */}
+      {showBookmarks && (
+        <div className="mb-4 p-3 bg-indigo-50 border border-indigo-200 rounded-lg max-h-40 overflow-y-auto">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="text-sm font-semibold text-indigo-800">Saved Bookmarks</h4>
+            <button onClick={() => setShowBookmarks(false)} className="text-indigo-600 hover:text-indigo-800 text-sm">
+              Close
+            </button>
+          </div>
+          {bookmarks.length === 0 ? (
+            <p className="text-sm text-indigo-600">No bookmarks saved yet.</p>
+          ) : (
+            <div className="space-y-2">
+              {bookmarks.map((bookmark) => (
+                <div
+                  key={bookmark.id}
+                  className="flex items-center justify-between p-2 bg-white rounded border border-indigo-200"
+                >
+                  <div className="flex-1">
+                    <div className="font-medium text-sm text-gray-900">{bookmark.name}</div>
+                    <div className="text-xs text-gray-500">
+                      Step {bookmark.step} • {formatTimestamp(bookmark.timestamp)}
+                    </div>
+                    <div className="text-xs text-gray-600 truncate">{bookmark.description}</div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => loadBookmark(bookmark)}
+                      className="p-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-all duration-200"
+                      title="Load Bookmark"
+                    >
+                      <Bookmark className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => deleteBookmark(bookmark.id)}
+                      className="p-1 bg-red-500 hover:bg-red-600 text-white rounded transition-all duration-200"
+                      title="Delete Bookmark"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Next Operation Preview */}
+      {isManualMode && nextOperation && !showBookmarks && !showBookmarkInput && (
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="text-sm font-medium text-blue-800">Next Operation:</div>
+          <div className="text-sm text-blue-600">{nextOperation.description}</div>
+        </div>
+      )}
+
       <div className="grid grid-cols-2 gap-6 h-full">
         {/* Animated Array */}
         <div className="space-y-2">
