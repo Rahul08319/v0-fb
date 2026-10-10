@@ -934,7 +934,7 @@ export function DataStructuresVisualization() {
             {/* Animated Edges */}
             <svg className="absolute inset-0 w-full h-full" viewBox="0 0 200 96">
               {graphEdges.map((edge, index) => {
-                const positions = {
+                const positions: Record<string, { x: number; y: number }> = {
                   A: { x: 30, y: 20 },
                   B: { x: 170, y: 20 },
                   C: { x: 45, y: 76 },
@@ -944,13 +944,16 @@ export function DataStructuresVisualization() {
                 const isHighlighted =
                   graphHighlight === `${edge.from}-${edge.to}` || graphHighlight === `${edge.to}-${edge.from}`
 
+                const posFrom = positions[edge.from] || { x: 0, y: 0 }
+                const posTo = positions[edge.to] || { x: 0, y: 0 }
+
                 return (
                   <line
                     key={`${edge.from}-${edge.to}-${index}`}
-                    x1={positions[edge.from].x}
-                    y1={positions[edge.from].y}
-                    x2={positions[edge.to].x}
-                    y2={positions[edge.to].y}
+                    x1={posFrom.x}
+                    y1={posFrom.y}
+                    x2={posTo.x}
+                    y2={posTo.y}
                     stroke={isHighlighted ? "#fbbf24" : "#6b7280"}
                     strokeWidth={isHighlighted ? "3" : "2"}
                     className="transition-all duration-500"
