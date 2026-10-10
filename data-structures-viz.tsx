@@ -576,104 +576,105 @@ export function DataStructuresVisualization() {
   }
 
   return (
-    <div className="w-full h-80 p-6 bg-gradient-to-br from-blue-50 to-purple-50">
-      {/* Animation Controls */}
-      <div className="flex items-center justify-between mb-4 p-3 bg-white/50 rounded-lg border border-gray-200">
-        <div className="flex items-center space-x-3">
+    <div className="w-full min-h-[22rem] p-5 bg-gradient-to-br from-slate-50/80 via-white to-blue-50/40 dark:from-[#18181A] dark:via-[#1C1C1E] dark:to-[#121214] text-gray-900 dark:text-gray-100 rounded-2xl transition-all">
+      {/* Animation Controls - Apple Frosted Dock */}
+      <div className="flex items-center justify-between mb-4 p-2.5 bg-white/70 dark:bg-[#2C2C2E]/70 backdrop-blur-xl rounded-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm">
+        <div className="flex items-center space-x-2">
           {/* Mode Toggle */}
           <button
             onClick={() => setIsManualMode(!isManualMode)}
-            className={`flex items-center justify-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+            className={`flex items-center justify-center px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
               isManualMode
-                ? "bg-purple-500 hover:bg-purple-600 text-white"
-                : "bg-gray-200 hover:bg-gray-300 text-gray-700"
+                ? "bg-[#AF52DE] text-white shadow-sm"
+                : "bg-black/[0.05] dark:bg-white/[0.08] hover:bg-black/[0.08] dark:hover:bg-white/[0.12] text-gray-700 dark:text-gray-300"
             }`}
           >
-            <Settings className="w-4 h-4 mr-1" />
-            {isManualMode ? "Manual" : "Auto"}
+            <Settings className="w-3.5 h-3.5 mr-1" />
+            {isManualMode ? "Manual Step" : "Auto Flow"}
           </button>
 
           {!isManualMode ? (
             <>
               <button
                 onClick={() => setIsPlaying(!isPlaying)}
-                className={`flex items-center justify-center w-10 h-10 rounded-full transition-all duration-200 ${
+                className={`flex items-center justify-center w-8 h-8 rounded-full transition-all duration-200 active:scale-95 ${
                   isPlaying
-                    ? "bg-orange-500 hover:bg-orange-600 text-white"
-                    : "bg-green-500 hover:bg-green-600 text-white"
+                    ? "bg-[#FF9500] hover:bg-[#E08500] text-white shadow-sm"
+                    : "bg-[#34C759] hover:bg-[#2EB34F] text-white shadow-sm"
                 }`}
               >
-                {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
+                {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
               </button>
-              <div className="text-sm font-medium text-gray-700">{isPlaying ? "Playing" : "Paused"}</div>
+              <div className="text-xs font-medium text-gray-600 dark:text-gray-300">{isPlaying ? "Active" : "Paused"}</div>
             </>
           ) : (
             <>
               <button
                 onClick={goToPreviousStep}
                 disabled={operationHistory.length === 0}
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white transition-all duration-200"
+                className="flex items-center justify-center w-8 h-8 rounded-full bg-[#0071E3] hover:bg-[#0077ED] disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed text-white transition-all active:scale-95 shadow-sm"
               >
-                <ChevronLeft className="w-5 h-5" />
+                <ChevronLeft className="w-4 h-4" />
               </button>
 
               <button
                 onClick={() => nextOperation && executeStep(nextOperation)}
                 disabled={isExecutingStep || !nextOperation}
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-green-500 hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white transition-all duration-200"
+                className="flex items-center justify-center w-8 h-8 rounded-full bg-[#34C759] hover:bg-[#2EB34F] disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed text-white transition-all active:scale-95 shadow-sm"
               >
-                <ChevronRight className="w-5 h-5" />
+                <ChevronRight className="w-4 h-4" />
               </button>
 
-              <div className="text-sm font-medium text-gray-700">
-                Step {currentStep} {isExecutingStep && "(Executing...)"}
+              <div className="text-xs font-medium text-gray-600 dark:text-gray-300">
+                Step {currentStep} {isExecutingStep && "(…)"}
               </div>
             </>
           )}
 
           <button
             onClick={resetAnimations}
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-500 hover:bg-gray-600 text-white transition-all duration-200"
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-black/[0.06] dark:bg-white/[0.08] hover:bg-black/[0.1] dark:hover:bg-white/[0.14] text-gray-700 dark:text-gray-200 transition-all active:scale-95"
+            title="Reset Simulation"
           >
-            <RotateCcw className="w-5 h-5" />
+            <RotateCcw className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2">
           {/* Bookmark Controls */}
           {isManualMode && (
             <>
               <button
                 onClick={() => setShowBookmarkInput(!showBookmarkInput)}
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-yellow-500 hover:bg-yellow-600 text-white transition-all duration-200"
+                className="flex items-center justify-center w-8 h-8 rounded-full bg-[#FF9500] hover:bg-[#E08500] text-white transition-all shadow-sm"
                 title="Save Bookmark"
               >
-                <BookmarkPlus className="w-5 h-5" />
+                <BookmarkPlus className="w-3.5 h-3.5" />
               </button>
 
               <button
                 onClick={() => setShowBookmarks(!showBookmarks)}
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white transition-all duration-200"
+                className="flex items-center justify-center w-8 h-8 rounded-full bg-[#5856D6] hover:bg-[#4E4CB8] text-white transition-all shadow-sm"
                 title="Load Bookmark"
               >
-                <FolderOpen className="w-5 h-5" />
+                <FolderOpen className="w-3.5 h-3.5" />
               </button>
             </>
           )}
 
           {!isManualMode && (
-            <>
-              <label className="text-sm font-medium text-gray-700">Speed:</label>
+            <div className="flex items-center space-x-1.5">
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Speed:</span>
               <select
                 value={animationSpeed}
                 onChange={(e) => setAnimationSpeed(Number(e.target.value))}
-                className="px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-2 py-1 text-xs bg-white dark:bg-[#1C1C1E] border border-black/[0.08] dark:border-white/[0.1] rounded-lg text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-[#0071E3]"
               >
                 <option value={1500}>Fast (1.5s)</option>
                 <option value={3000}>Normal (3s)</option>
                 <option value={5000}>Slow (5s)</option>
               </select>
-            </>
+            </div>
           )}
         </div>
       </div>
@@ -961,24 +962,24 @@ export function DataStructuresVisualization() {
         </div>
       </div>
 
-      {/* Algorithm Complexity */}
-      <div className="mt-4 pt-4 border-t border-gray-200">
-        <div className="flex justify-between text-xs">
-          <div className="text-center">
-            <div className="font-semibold text-gray-700">Search</div>
-            <div className="text-green-600">O(log n)</div>
+      {/* Algorithm Complexity - Apple Bento Badges */}
+      <div className="mt-4 pt-3 border-t border-black/[0.06] dark:border-white/[0.08]">
+        <div className="grid grid-cols-4 gap-2 text-xs">
+          <div className="text-center p-2 rounded-xl bg-white/70 dark:bg-[#2C2C2E]/70 border border-black/[0.04] dark:border-white/[0.06] shadow-xs">
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Search</div>
+            <div className="text-[#34C759] font-bold text-xs mt-0.5">O(log n)</div>
           </div>
-          <div className="text-center">
-            <div className="font-semibold text-gray-700">Insert</div>
-            <div className="text-blue-600">O(1)</div>
+          <div className="text-center p-2 rounded-xl bg-white/70 dark:bg-[#2C2C2E]/70 border border-black/[0.04] dark:border-white/[0.06] shadow-xs">
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Insert</div>
+            <div className="text-[#0071E3] font-bold text-xs mt-0.5">O(1)</div>
           </div>
-          <div className="text-center">
-            <div className="font-semibold text-gray-700">Delete</div>
-            <div className="text-orange-600">O(n)</div>
+          <div className="text-center p-2 rounded-xl bg-white/70 dark:bg-[#2C2C2E]/70 border border-black/[0.04] dark:border-white/[0.06] shadow-xs">
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Delete</div>
+            <div className="text-[#FF9500] font-bold text-xs mt-0.5">O(n)</div>
           </div>
-          <div className="text-center">
-            <div className="font-semibold text-gray-700">Space</div>
-            <div className="text-purple-600">O(n)</div>
+          <div className="text-center p-2 rounded-xl bg-white/70 dark:bg-[#2C2C2E]/70 border border-black/[0.04] dark:border-white/[0.06] shadow-xs">
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Space</div>
+            <div className="text-[#AF52DE] font-bold text-xs mt-0.5">O(n)</div>
           </div>
         </div>
       </div>
