@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
-import { getCurrentYear } from '@/lib/auto-updater'
 
 export const viewport: Viewport = {
   themeColor: [
