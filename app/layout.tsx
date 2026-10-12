@@ -12,13 +12,13 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: `EchoPost Studio • Apple-Grade Social & Algorithm Studio (${new Date().getFullYear()})`,
-  description: 'High-performance social content generator, interactive data structures visualizer, and multi-page Facebook publisher crafted with Apple Human Interface Guidelines and Liquid Glass aesthetics.',
-  keywords: ['Facebook Publisher', 'Data Structures Visualizer', 'Apple Design', 'Next.js 15', 'AI Post Generator', 'TypeSafe AI'],
-  authors: [{ name: 'Rahul Kumar', url: 'https://github.com/Rahul08319' }],
+  title: ` FBPostForge • Apple-Grade Social & Algorithm Studio (${new Date().getFullYear()})`,
+  description: 'Next-Generation Social Publishing & Computer Science Studio crafted with Apple Liquid Glass aesthetics, TypeSafe AI System One architecture, and dynamic multi-year engine.',
+  keywords: ['FBPostForge', 'Facebook Publisher', 'Data Structures Visualizer', 'Apple Design', 'Next.js 15', 'AI Post Generator', 'TypeSafe AI'],
+  authors: [{ name: 'Rahul Kumar', url: 'https://github.com/Rahul08319/FBPostForge' }],
   openGraph: {
-    title: 'EchoPost Studio • Next-Gen Facebook & Algorithm Studio',
-    description: 'Interactive social posting and algorithm visualization platform designed with Apple aesthetics.',
+    title: ' FBPostForge • Social & Algorithm Engineering Studio',
+    description: 'High-performance social content generator, interactive data structures visualizer, and multi-page Facebook publisher crafted with Apple aesthetics.',
     type: 'website',
   },
 }

@@ -1,6 +1,7 @@
 {
-  "name": "my-v0-project",
-  "version": "0.1.0",
+  "name": "fb-post-forge",
+  "version": "1.0.0",
+  "description": "Next-Generation Social Publishing & Computer Science Studio crafted with Apple Liquid Glass aesthetics, TypeSafe AI System One architecture, and dynamic multi-year engine.",
   "private": true,
   "packageManager": "pnpm@9.15.9",
   "scripts": {
