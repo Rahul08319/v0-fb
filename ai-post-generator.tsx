@@ -76,6 +76,30 @@ export default function AIPostGenerator() {
       imageUrl: "/placeholder.svg?height=400&width=600&text=Algorithm+Complexity+Curves",
       category: "Algorithms",
     },
+    "tech-news": {
+      title: `📱 Apple Liquid Glass & Spatial Web Standards in ${currentYear}`,
+      content: `Interface engineering is entering a new era of spatial depth and physical motion! \n\n🔹 **Optical Refraction & Lensing** — Real-time backdrop shaders adapt dynamically to underlying content luminance\n🔹 **Spring Physics over Linear Easing** — Interruptible velocity handoffs make web apps feel tactile and responsive\n🔹 **On-Device System One Models** — Zero-latency semantic routing directly in the browser runtime\n\nHow are you adopting spatial UI principles in your ${currentYear} applications? Share below! ✨`,
+      hashtags: ["#AppleDesign", "#LiquidGlass", "#FrontendEngineering", `#WebStandards${currentYear}`, "#UIUX"],
+      imagePrompt: "Translucent Liquid Glass spatial layers floating over dark titanium grid",
+      imageUrl: "/placeholder.svg?height=400&width=600&text=Liquid+Glass+UI",
+      category: "Tech Trends",
+    },
+    career: {
+      title: `💼 Staff Engineer System Design Roadmap for ${currentYear}`,
+      content: `Transitioning from Senior to Staff Engineer requires shifting from code execution to architectural leverage: 🎯\n\n1️⃣ **Bounded Contexts & API Contracts** — Design interfaces that allow 10+ teams to ship independently\n2️⃣ **Observability & SLO Discipline** — Measure p99 tail latency, error budgets, and durable queue backpressure\n3️⃣ **Deterministic AI Orchestration** — Combine TypeSafe Choice primitives with idempotent workflow steps\n\nWhat engineering principle made the biggest impact on your career? 👇`,
+      hashtags: ["#SoftwareArchitecture", "#StaffEngineer", "#TechCareer", `#SystemDesign${currentYear}`, "#EngineeringLeadership"],
+      imagePrompt: "Distributed cloud topology blueprint with glowing telemetry nodes",
+      imageUrl: "/placeholder.svg?height=400&width=600&text=System+Design+Blueprint",
+      category: "Tech Career",
+    },
+    tutorials: {
+      title: `📚 Building Durable Full-Stack Apps with Next.js & TypeSafe (${currentYear})`,
+      content: `Step-by-step architectural guide to building crash-safe, high-throughput web applications: 🛠️\n\n✅ **Step 1:** Configure React Server Components for zero-bundle-size data fetching\n✅ **Step 2:** Wire TypeSafe System One Choice primitives for sub-15ms semantic classification\n✅ **Step 3:** Add perpetual temporal scheduling so your content & roadmaps auto-update every year\n\nBookmark this guide for your next production deployment! 🚀`,
+      hashtags: ["#NextJS", "#React19", "#TypeSafeAI", "#FullStackTutorial", `#WebDev${currentYear}`],
+      imagePrompt: "Interactive code sandbox showing live React Server Components and TypeSafe pipeline",
+      imageUrl: "/placeholder.svg?height=400&width=600&text=FullStack+Architecture",
+      category: "Tutorials",
+    },
   }
 
   const [generatedPost, setGeneratedPost] = useState<GeneratedPost | null>({

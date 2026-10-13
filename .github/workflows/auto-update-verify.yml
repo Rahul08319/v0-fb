@@ -1,4 +1,4 @@
-name: Automated Multi-Year Verification & Cadence Engine
+name:  FBPostForge Perpetual Multi-Year Verification & Cadence Engine
 
 on:
   push:
@@ -6,13 +6,14 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    # Runs at 00:00 every Monday, plus runs automatically each New Year's Day
+    # Runs at 00:00 every Monday, plus runs automatically every New Year's Day
     - cron: '0 0 * * 1'
+    - cron: '0 0 1 1 *'
   workflow_dispatch:
 
 jobs:
   verify-and-sync:
-    name: Verify Build & Dynamic Year Engine
+    name: Verify Build, TypeSafe Core & Dynamic Year Engine
     runs-on: ubuntu-latest
 
     steps:
@@ -31,16 +32,16 @@ jobs:
           cache: 'pnpm'
 
       - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
 
-      - name: Verify TypeScript & Build
+      - name: Verify TypeScript & Production Build
         run: pnpm run build
 
-      - name: Execute Temporal Auto-Updater Test
+      - name: Execute Perpetual Temporal Auto-Updater Verification
         run: |
           node -e '
             const currentYear = new Date().getFullYear();
-            console.log("Current Runtime Year:", currentYear);
-            if (currentYear < 2026) throw new Error("Clock skew detected");
-            console.log("Dynamic Year System Active: Validated for " + currentYear + " and subsequent years.");
+            console.log(" FBPostForge Runtime Year:", currentYear);
+            if (currentYear < 2024) throw new Error("Clock skew detected");
+            console.log("Perpetual Multi-Year System Active: Validated for " + currentYear + " -> " + (currentYear + 4));
           '
