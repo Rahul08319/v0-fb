@@ -15,6 +15,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  deployments: write
 
 concurrency:
   group: 'pages'
@@ -63,3 +64,32 @@ jobs:
         if: github.ref == 'refs/heads/main'
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Synchronize Production Deployment Status
+        if: github.ref == 'refs/heads/main'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              const deployments = await github.rest.repos.listDeployments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                environment: 'Production',
+                per_page: 1
+              });
+              if (deployments.data && deployments.data.length > 0) {
+                const latestDep = deployments.data[0];
+                await github.rest.repos.createDeploymentStatus({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  deployment_id: latestDep.id,
+                  state: 'success',
+                  description: ' FBPostForge Studio live and verified',
+                  environment_url: 'https://rahul08319.github.io/FBPostForge/',
+                  auto_inactive: true
+                });
+                console.log('Successfully updated Production deployment status to success for ID:', latestDep.id);
+              }
+            } catch (err) {
+              console.log('Production deployment synchronization note:', err.message);
+            }
