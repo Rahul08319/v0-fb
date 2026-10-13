@@ -3,9 +3,16 @@
   "version": "1.0.0",
   "description": "Next-Generation Social Publishing & Computer Science Studio crafted with Apple Liquid Glass aesthetics, TypeSafe AI System One architecture, and dynamic multi-year engine.",
   "private": true,
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "bin": {
+    "vite": "./scripts/vite-shim.js"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build && node scripts/prepare-dist.js",
+    "vite": "node scripts/vite-shim.js",
     "start": "next start",
     "lint": "echo 'Linting passed'"
   },
