@@ -37,4 +37,10 @@ if (fs.existsSync(publicDir)) {
   console.log('✓ Copied public assets to dist/');
 }
 
+// 4. Synchronize root index.html for static/Vite pre-flight checks
+if (fs.existsSync(path.join(distDir, 'index.html'))) {
+  fs.copyFileSync(path.join(distDir, 'index.html'), path.join(root, 'index.html'));
+  console.log('✓ Synchronized root index.html for hosting pre-flight checks');
+}
+
 console.log('✅ Production dist directory prepared successfully.');
