@@ -17,7 +17,7 @@
 
 <br />
 
-[**Explore Live Deployment**](https://vercel.com/rahul-kumars-projects-40642283/v0-fb) • [**GitHub Repository**](https://github.com/Rahul08319/FBPostForge) • [**TypeSafe Architecture**](#-typesafe-system-one-architecture--evaluation) • [**Report an Issue**](https://github.com/Rahul08319/FBPostForge/issues)
+[**Live Studio (GitHub Pages)**](https://rahul08319.github.io/FBPostForge/) • [**Vercel Production**](https://fb-post-forge.vercel.app/) • [**GitHub Repository**](https://github.com/Rahul08319/FBPostForge) • [**TypeSafe Architecture**](#-typesafe-system-one-architecture--evaluation) • [**Report an Issue**](https://github.com/Rahul08319/FBPostForge/issues)
 
 <br />
 
